@@ -8,7 +8,8 @@ export interface SignupRequestDto {
 }
 
 export interface VerifySignupDto {
-  phoneNumber: string;
+  phone?: string;
+  phoneNumber?: string;
   code: string;
 }
 

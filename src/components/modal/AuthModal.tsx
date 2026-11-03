@@ -10,6 +10,8 @@ import {
   Loader2,
   ArrowLeft,
   ExternalLink,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { authApi } from '../../api/auth';
@@ -23,10 +25,12 @@ export const AuthModal: React.FC = () => {
   // Signin fields
   const [signinUsername, setSigninUsername] = useState('');
   const [signinPassword, setSigninPassword] = useState('');
+  const [showSigninPassword, setShowSigninPassword] = useState(false);
 
   // Signup fields
   const [signupPhone, setSignupPhone] = useState('+998');
   const [signupPassword, setSignupPassword] = useState('');
+  const [showSignupPassword, setShowSignupPassword] = useState(false);
   const [signupUsername, setSignupUsername] = useState('');
   const [signupFullName, setSignupFullName] = useState('');
 
@@ -143,6 +147,7 @@ export const AuthModal: React.FC = () => {
 
     try {
       await authApi.verifySignup({
+        phone: signupPhone,
         phoneNumber: signupPhone,
         code: otpCode.trim(),
       });
@@ -263,13 +268,25 @@ export const AuthModal: React.FC = () => {
               <div className="relative">
                 <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
                 <input
-                  type="password"
+                  type={showSigninPassword ? 'text' : 'password'}
                   required
                   value={signinPassword}
                   onChange={(e) => setSigninPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
+                  className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowSigninPassword((prev) => !prev)}
+                  className="absolute right-3.5 top-3 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors"
+                  title={showSigninPassword ? 'Parolni yashirish' : 'Parolni ko‘rsatish'}
+                >
+                  {showSigninPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
               </div>
             </div>
 
@@ -340,14 +357,26 @@ export const AuthModal: React.FC = () => {
               <div className="relative">
                 <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
                 <input
-                  type="password"
+                  type={showSignupPassword ? 'text' : 'password'}
                   required
                   value={signupPassword}
                   onChange={(e) => setSignupPassword(e.target.value)}
                   placeholder="Kamida 6 ta belgi"
                   minLength={6}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
+                  className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowSignupPassword((prev) => !prev)}
+                  className="absolute right-3.5 top-3 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors"
+                  title={showSignupPassword ? 'Parolni yashirish' : 'Parolni ko‘rsatish'}
+                >
+                  {showSignupPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
               </div>
             </div>
 
@@ -426,12 +455,17 @@ export const AuthModal: React.FC = () => {
               <label className="block text-xs font-bold text-gray-700 mb-1 text-center">
                 6 xonali tasdiqlash kodini kiriting
               </label>
+              <p className="text-[11px] text-gray-400 text-center mb-2">
+                Telegram botingizga yuborilgan kodni kiriting
+              </p>
               <input
                 type="text"
                 required
                 maxLength={6}
+                inputMode="numeric"
+                autoFocus
                 value={otpCode}
-                onChange={(e) => setOtpCode(e.target.value)}
+                onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
                 placeholder="123456"
                 className="w-full py-3 text-center tracking-[0.5em] text-2xl font-bold rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all"
               />
@@ -450,6 +484,7 @@ export const AuthModal: React.FC = () => {
               onClick={() => {
                 setIsVerifyingOtp(false);
                 setIsWaitingTelegram(false);
+                setOtpCode('');
                 setError(null);
               }}
               className="w-full text-xs text-gray-500 hover:text-gray-800 text-center font-medium"
