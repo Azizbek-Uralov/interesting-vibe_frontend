@@ -23,6 +23,18 @@ export const mediaApi = {
     return res.data;
   },
 
+  uploadMultiple: async (files: File[]): Promise<UploadResult[]> => {
+    const formData = new FormData();
+    files.forEach((f) => formData.append('files', f));
+
+    const res = await apiClient.post('/media/upload-multiple', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return res.data;
+  },
+
   getMetadata: async (id: string) => {
     const res = await apiClient.get(`/media/${id}`);
     return res.data;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   Search,
@@ -12,6 +12,7 @@ import {
   LogOut,
   User as UserIcon,
   X,
+  Sparkles,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useChat } from '../../context/ChatContext';
@@ -43,6 +44,41 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCreateModal }) => {
     }
   }, [isAuthenticated, location.pathname]);
 
+  // URL o'zgarganda qidiruv maydonini sinxronlashtirish
+  useEffect(() => {
+    if (location.pathname === '/explore') {
+      const q = new URLSearchParams(location.search).get('q') || '';
+      setSearchQuery(q);
+    }
+  }, [location.pathname, location.search]);
+
+  // Real-time debounced qidiruv
+  const isTypingRef = useRef(false);
+  const handleInputChange = (val: string) => {
+    isTypingRef.current = true;
+    setSearchQuery(val);
+  };
+
+  useEffect(() => {
+    if (!isTypingRef.current) return;
+    const trimmed = searchQuery.trim();
+
+    if (!trimmed) {
+      if (location.pathname === '/explore') {
+        navigate('/explore', { replace: true });
+      }
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      navigate(`/explore?q=${encodeURIComponent(trimmed)}`, {
+        replace: location.pathname === '/explore',
+      });
+    }, 350);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery, navigate, location.pathname]);
+
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
@@ -51,62 +87,68 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCreateModal }) => {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm transition-all">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+    <header className="sticky top-0 z-40 bg-[#FAF7F2]/90 backdrop-blur-md border-b border-[#EAE3D2] transition-all">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3 sm:gap-4">
         {/* Left: Logo & Navigation */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4 sm:gap-6">
           <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-full bg-brand-500 text-white flex items-center justify-center font-bold text-xl shadow-md shadow-brand-500/20 group-hover:scale-105 transition-transform">
-              V
+            <div className="w-10 h-10 rounded-full bg-[#8B5E3C] text-white flex items-center justify-center font-extrabold text-xl shadow-md shadow-[#8B5E3C]/20 group-hover:bg-[#6E472B] transition-all">
+              <Sparkles className="w-5 h-5 fill-white/20 stroke-[2.5]" />
             </div>
-            <span className="font-extrabold text-xl tracking-tight bg-gradient-to-r from-gray-950 to-gray-700 bg-clip-text text-transparent hidden sm:inline">
-              Visual<span className="text-brand-500">.</span>
+            <span className="font-extrabold text-xl tracking-tight text-[#2C221E] hidden sm:inline">
+              Interesting<span className="text-[#8B5E3C]">-Vibe</span>
             </span>
           </Link>
 
-          <nav className="flex items-center gap-1 ml-2">
+          <nav className="flex items-center gap-2 ml-1">
             <Link
               to="/"
-              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all ${
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 text-sm font-bold transition-all relative ${
                 location.pathname === '/'
-                  ? 'bg-gray-900 text-white shadow-sm'
-                  : 'text-gray-600 hover:bg-gray-100'
+                  ? 'text-[#2C221E]'
+                  : 'text-[#8C7A6B] hover:text-[#2C221E]'
               }`}
             >
               <Home className="w-4 h-4" />
-              <span className="hidden md:inline">Asosiy</span>
+              <span className="hidden md:inline">Bosh sahifa</span>
+              {location.pathname === '/' && (
+                <span className="absolute bottom-[-14px] left-0 right-0 h-0.5 bg-[#8B5E3C] rounded-full" />
+              )}
             </Link>
 
             <Link
               to="/explore"
-              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all ${
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 text-sm font-bold transition-all relative ${
                 location.pathname === '/explore'
-                  ? 'bg-gray-900 text-white shadow-sm'
-                  : 'text-gray-600 hover:bg-gray-100'
+                  ? 'text-[#2C221E]'
+                  : 'text-[#8C7A6B] hover:text-[#2C221E]'
               }`}
             >
               <Compass className="w-4 h-4" />
               <span className="hidden md:inline">Kashf qilish</span>
+              {location.pathname === '/explore' && (
+                <span className="absolute bottom-[-14px] left-0 right-0 h-0.5 bg-[#8B5E3C] rounded-full" />
+              )}
             </Link>
           </nav>
         </div>
 
         {/* Center: Search Bar */}
-        <form onSubmit={handleSearchSubmit} className="flex-1 max-w-2xl relative">
+        <form onSubmit={handleSearchSubmit} className="flex-1 max-w-xl relative">
           <div className="relative flex items-center">
-            <Search className="w-4 h-4 text-gray-400 absolute left-4 pointer-events-none" />
+            <Search className="w-4 h-4 text-[#8C7A6B] absolute left-4 pointer-events-none" />
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="G‘oyalar, rasmlar, videolar yoki mualliflarni qidiring..."
-              className="w-full pl-11 pr-10 py-2.5 rounded-full bg-gray-100/90 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white border border-transparent transition-all"
+              onChange={(e) => handleInputChange(e.target.value)}
+              placeholder="G‘oyalar, rasmlar va videolarni qidiring..."
+              className="w-full pl-11 pr-10 py-2.5 rounded-full bg-[#EFE7DD] text-[#2C221E] placeholder-[#8C7A6B] text-sm focus:outline-none focus:ring-2 focus:ring-[#8B5E3C] focus:bg-white border border-transparent transition-all"
             />
             {searchQuery && (
               <button
                 type="button"
-                onClick={() => setSearchQuery('')}
-                className="absolute right-3 text-gray-400 hover:text-gray-600"
+                onClick={() => handleInputChange('')}
+                className="absolute right-3.5 text-[#8C7A6B] hover:text-[#2C221E]"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -114,30 +156,41 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCreateModal }) => {
           </div>
         </form>
 
-        {/* Right: Actions / Auth */}
+        {/* Right: Actions & User */}
         <div className="flex items-center gap-2 sm:gap-3">
           {isAuthenticated ? (
             <>
-              {/* Create Post Button */}
+              {/* Create (+) Button */}
               <button
                 onClick={onOpenCreateModal}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-brand-500 hover:bg-brand-600 text-white font-semibold text-sm shadow-md shadow-brand-500/20 active:scale-95 transition-all"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#8B5E3C] hover:bg-[#6E472B] active:scale-95 text-white font-bold text-sm shadow-md shadow-[#8B5E3C]/20 transition-all"
               >
                 <Plus className="w-4 h-4 stroke-[3]" />
                 <span className="hidden sm:inline">Yaratish</span>
               </button>
 
+              {/* Collections Button */}
+              <Link
+                to="/collections"
+                className={`p-2.5 rounded-full text-[#2C221E] hover:bg-[#EFE7DD] transition-colors ${
+                  location.pathname === '/collections' ? 'bg-[#EFE7DD]' : ''
+                }`}
+                title="To‘plamlar (Collections)"
+              >
+                <Bookmark className="w-5 h-5" />
+              </Link>
+
               {/* Messages */}
               <Link
                 to="/messages"
-                className={`relative p-2.5 rounded-full text-gray-600 hover:bg-gray-100 transition-colors ${
-                  location.pathname === '/messages' ? 'bg-gray-100 text-gray-900' : ''
+                className={`relative p-2.5 rounded-full text-[#2C221E] hover:bg-[#EFE7DD] transition-colors ${
+                  location.pathname === '/messages' ? 'bg-[#EFE7DD]' : ''
                 }`}
                 title="Xabarlar"
               >
                 <MessageSquare className="w-5 h-5" />
                 {totalUnreadCount > 0 && (
-                  <span className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-brand-500 text-white text-[10px] font-bold flex items-center justify-center animate-pulse">
+                  <span className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-[#8B5E3C] text-white text-[10px] font-bold flex items-center justify-center animate-pulse">
                     {totalUnreadCount > 9 ? '9+' : totalUnreadCount}
                   </span>
                 )}
@@ -146,22 +199,22 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCreateModal }) => {
               {/* Notifications */}
               <Link
                 to="/notifications"
-                className="relative p-2.5 rounded-full text-gray-600 hover:bg-gray-100 transition-colors"
+                className={`relative p-2.5 rounded-full text-[#2C221E] hover:bg-[#EFE7DD] transition-colors ${
+                  location.pathname === '/notifications' ? 'bg-[#EFE7DD]' : ''
+                }`}
                 title="Bildirishnomalar"
               >
                 <Bell className="w-5 h-5" />
                 {unreadCount > 0 && (
-                  <span className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-brand-500 text-white text-[10px] font-bold flex items-center justify-center animate-pulse">
-                    {unreadCount > 9 ? '9+' : unreadCount}
-                  </span>
+                  <span className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-[#8B5E3C] ring-2 ring-[#FAF7F2]" />
                 )}
               </Link>
 
-              {/* User Dropdown */}
+              {/* Profile Avatar Dropdown */}
               <div className="relative">
                 <button
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                  className="flex items-center gap-2 p-1 rounded-full hover:ring-2 hover:ring-gray-200 transition-all focus:outline-none"
+                  className="flex items-center gap-2 p-0.5 rounded-full hover:ring-2 hover:ring-[#8B5E3C]/30 transition-all focus:outline-none"
                 >
                   <Avatar
                     src={user?.avatarUrl}
@@ -176,12 +229,12 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCreateModal }) => {
                       className="fixed inset-0 z-30"
                       onClick={() => setIsUserMenuOpen(false)}
                     />
-                    <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 z-40 animate-in fade-in zoom-in-95 duration-100">
-                      <div className="px-4 py-3 border-b border-gray-100">
-                        <p className="font-bold text-gray-900 truncate">
+                    <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-[#EAE3D2] py-2 z-40 animate-in fade-in zoom-in-95 duration-100">
+                      <div className="px-4 py-3 border-b border-[#EAE3D2]">
+                        <p className="font-bold text-[#2C221E] truncate">
                           {user?.fullName || 'Foydalanuvchi'}
                         </p>
-                        <p className="text-xs text-gray-500 truncate">
+                        <p className="text-xs text-[#8C7A6B] truncate">
                           @{user?.username || 'user'}
                         </p>
                       </div>
@@ -190,59 +243,43 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCreateModal }) => {
                         <Link
                           to={`/profile/${user?.username}`}
                           onClick={() => setIsUserMenuOpen(false)}
-                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#2C221E] hover:bg-[#FAF7F2] transition-colors"
                         >
-                          <UserIcon className="w-4 h-4 text-gray-500" />
+                          <UserIcon className="w-4 h-4 text-[#8C7A6B]" />
                           Mening profilim
-                        </Link>
-
-                        <Link
-                          to="/messages"
-                          onClick={() => setIsUserMenuOpen(false)}
-                          className="flex items-center justify-between px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                        >
-                          <div className="flex items-center gap-3">
-                            <MessageSquare className="w-4 h-4 text-gray-500" />
-                            Xabarlar
-                          </div>
-                          {totalUnreadCount > 0 && (
-                            <span className="bg-brand-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
-                              {totalUnreadCount}
-                            </span>
-                          )}
                         </Link>
 
                         <Link
                           to="/collections"
                           onClick={() => setIsUserMenuOpen(false)}
-                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#2C221E] hover:bg-[#FAF7F2] transition-colors"
                         >
-                          <Bookmark className="w-4 h-4 text-gray-500" />
-                          To‘plamlarim
+                          <Bookmark className="w-4 h-4 text-[#8C7A6B]" />
+                          Saqlanganlar
                         </Link>
 
-                        {(user?.role === 'ADMIN' || user?.role === 'SUPERADMIN') && (
+                        {user?.role === 'SUPERADMIN' && (
                           <Link
                             to="/admin"
                             onClick={() => setIsUserMenuOpen(false)}
-                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-indigo-600 hover:bg-indigo-50 font-medium transition-colors"
+                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#8B5E3C] font-semibold hover:bg-[#FAF7F2] transition-colors"
                           >
-                            <Shield className="w-4 h-4 text-indigo-600" />
-                            Admin Panel ({user.role})
+                            <Shield className="w-4 h-4 text-[#8B5E3C]" />
+                            Admin panel
                           </Link>
                         )}
                       </div>
 
-                      <div className="border-t border-gray-100 pt-1">
+                      <div className="border-t border-[#EAE3D2] pt-1">
                         <button
                           onClick={() => {
                             setIsUserMenuOpen(false);
                             logoutUser();
                           }}
-                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-rose-600 hover:bg-rose-50 transition-colors text-left font-medium"
+                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#C85A5A] hover:bg-rose-50 transition-colors font-medium text-left"
                         >
-                          <LogOut className="w-4 h-4 text-rose-600" />
-                          Tizimdan chiqish
+                          <LogOut className="w-4 h-4 text-[#C85A5A]" />
+                          Chiqish
                         </button>
                       </div>
                     </div>
@@ -254,13 +291,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCreateModal }) => {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => openAuthModal('signin')}
-                className="px-4 py-2 rounded-full text-sm font-semibold text-gray-700 hover:bg-gray-100 transition-colors"
+                className="px-4 py-2 rounded-full text-[#2C221E] hover:bg-[#EFE7DD] text-sm font-bold transition-all"
               >
                 Kirish
               </button>
               <button
                 onClick={() => openAuthModal('signup')}
-                className="px-4 py-2 rounded-full bg-brand-500 hover:bg-brand-600 text-white font-semibold text-sm shadow-md shadow-brand-500/20 active:scale-95 transition-all"
+                className="px-4 py-2 rounded-full bg-[#8B5E3C] hover:bg-[#6E472B] active:scale-95 text-white text-sm font-bold shadow-md shadow-[#8B5E3C]/20 transition-all"
               >
                 Ro‘yxatdan o‘tish
               </button>
@@ -271,4 +308,3 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCreateModal }) => {
     </header>
   );
 };
-

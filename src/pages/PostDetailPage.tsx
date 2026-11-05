@@ -11,7 +11,6 @@ import {
   ChevronRight,
   ArrowLeft,
   Check,
-  UserPlus,
 } from 'lucide-react';
 import { postsApi } from '../api/posts';
 import { likesApi } from '../api/likes';
@@ -56,7 +55,7 @@ export const PostDetailPage: React.FC = () => {
   if (isLoading) {
     return (
       <div className="py-24 flex justify-center">
-        <div className="w-8 h-8 rounded-full border-4 border-brand-500 border-t-transparent animate-spin" />
+        <div className="w-10 h-10 rounded-full border-4 border-[#8B5E3C] border-t-transparent animate-spin" />
       </div>
     );
   }
@@ -64,13 +63,13 @@ export const PostDetailPage: React.FC = () => {
   if (error || !post) {
     return (
       <div className="py-20 text-center max-w-md mx-auto space-y-4">
-        <div className="w-16 h-16 mx-auto rounded-full bg-rose-50 text-rose-500 flex items-center justify-center text-2xl font-bold">
+        <div className="w-16 h-16 mx-auto rounded-full bg-rose-50 text-[#C85A5A] flex items-center justify-center text-2xl font-bold">
           !
         </div>
-        <h2 className="text-xl font-bold text-gray-900">{error || 'Post topilmadi'}</h2>
+        <h2 className="text-xl font-extrabold text-[#2C221E]">{error || 'Post topilmadi'}</h2>
         <button
           onClick={() => navigate(-1)}
-          className="px-5 py-2 rounded-full bg-gray-900 text-white text-xs font-bold"
+          className="px-6 py-2.5 rounded-full bg-[#8B5E3C] text-white text-xs font-bold hover:bg-[#6E472B] transition-all"
         >
           Orqaga qaytish
         </button>
@@ -98,6 +97,7 @@ export const PostDetailPage: React.FC = () => {
       }
     } catch {
       setIsLiked(!isLiked);
+      setLikesCount(post.likesCount);
     }
   };
 
@@ -135,37 +135,48 @@ export const PostDetailPage: React.FC = () => {
     setTimeout(() => setCopySuccess(false), 2000);
   };
 
+  const handleDownloadMain = () => {
+    if (currentMedia?.url) {
+      const a = document.createElement('a');
+      a.href = currentMedia.url;
+      a.download = `vibe-${post.id}-${activeMediaIndex + 1}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+  };
+
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       {/* Back Button */}
       <button
         onClick={() => navigate(-1)}
-        className="flex items-center gap-2 text-sm font-bold text-gray-600 hover:text-gray-900 transition-colors"
+        className="inline-flex items-center gap-2 text-sm font-bold text-[#8C7A6B] hover:text-[#2C221E] transition-colors"
       >
-        <ArrowLeft className="w-4 h-4" /> Orqaga
+        <ArrowLeft className="w-4 h-4" /> Orqaga qaytish
       </button>
 
-      {/* Main Post Card */}
-      <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden grid grid-cols-1 md:grid-cols-12">
-        {/* Left Column: Media Player / Carousel */}
-        <div className="md:col-span-7 bg-black flex items-center justify-center relative min-h-[420px] max-h-[700px] overflow-hidden">
+      {/* Main Post Card (Pinterest-style 28px rounded box) */}
+      <div className="bg-white rounded-[28px] shadow-2xl border border-[#E6DEC3] overflow-hidden grid grid-cols-1 md:grid-cols-12">
+        {/* Left Column: Media Player / Carousel (50%) */}
+        <div className="md:col-span-7 bg-[#2C221E] flex items-center justify-center relative min-h-[460px] max-h-[720px] overflow-hidden">
           {currentMedia ? (
             currentMedia.type === 'VIDEO' ? (
               <video
                 src={currentMedia.url}
                 controls
                 autoPlay
-                className="w-full h-full object-contain max-h-[700px]"
+                className="w-full h-full object-contain max-h-[720px]"
               />
             ) : (
               <img
                 src={currentMedia.url}
-                alt={post.title || 'Media'}
-                className="w-full h-full object-contain max-h-[700px]"
+                alt={post.title || 'Interesting content'}
+                className="w-full h-full object-contain max-h-[720px]"
               />
             )
           ) : (
-            <div className="text-gray-400 text-sm">Media fayl mavjud emas</div>
+            <div className="text-[#8C7A6B] text-sm font-medium">Media fayl mavjud emas</div>
           )}
 
           {/* Carousel Arrows */}
@@ -177,7 +188,7 @@ export const PostDetailPage: React.FC = () => {
                     prev > 0 ? prev - 1 : post.media.length - 1,
                   )
                 }
-                className="absolute left-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white text-gray-800 backdrop-blur-md shadow-md transition-all"
+                className="absolute left-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-[#FAF7F2]/90 hover:bg-white text-[#2C221E] backdrop-blur-md shadow-md transition-all"
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
@@ -187,18 +198,18 @@ export const PostDetailPage: React.FC = () => {
                     prev < post.media.length - 1 ? prev + 1 : 0,
                   )
                 }
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white text-gray-800 backdrop-blur-md shadow-md transition-all"
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-[#FAF7F2]/90 hover:bg-white text-[#2C221E] backdrop-blur-md shadow-md transition-all"
               >
                 <ChevronRight className="w-5 h-5" />
               </button>
 
               {/* Dots */}
-              <div className="absolute bottom-3 flex gap-1.5 justify-center">
+              <div className="absolute bottom-4 flex gap-1.5 justify-center">
                 {post.media.map((_, i) => (
                   <span
                     key={i}
-                    className={`w-2 h-2 rounded-full transition-all ${
-                      i === activeMediaIndex ? 'bg-white w-4' : 'bg-white/50'
+                    className={`h-2 rounded-full transition-all ${
+                      i === activeMediaIndex ? 'bg-[#8B5E3C] w-6' : 'bg-white/60 w-2'
                     }`}
                   />
                 ))}
@@ -207,28 +218,63 @@ export const PostDetailPage: React.FC = () => {
           )}
         </div>
 
-        {/* Right Column: Post Details & Author */}
-        <div className="md:col-span-5 p-6 sm:p-8 flex flex-col justify-between space-y-6">
+        {/* Right Column: Post Details & Actions (50%) */}
+        <div className="md:col-span-5 p-6 sm:p-8 flex flex-col justify-between space-y-6 bg-white">
           <div className="space-y-6">
-            {/* Top Toolbar */}
-            <div className="flex items-center justify-between pb-4 border-b border-gray-100">
-              <div className="flex items-center gap-2">
+            {/* Header: Author & Actions Bar */}
+            <div className="flex items-center justify-between pb-4 border-b border-[#EAE3D2]">
+              {/* Author & Follow */}
+              <div className="flex items-center gap-3">
+                <Link
+                  to={`/profile/${post.author?.username}`}
+                  className="flex items-center gap-2.5 hover:opacity-85 transition-opacity"
+                >
+                  <Avatar
+                    src={post.author?.avatarUrl}
+                    name={post.author?.fullName || post.author?.username}
+                    size="md"
+                  />
+                  <div>
+                    <p className="font-extrabold text-sm text-[#2C221E] leading-tight">
+                      {post.author?.fullName || post.author?.username}
+                    </p>
+                    <p className="text-xs text-[#8C7A6B]">@{post.author?.username}</p>
+                  </div>
+                </Link>
+
+                {!isOwner && (
+                  <button
+                    onClick={handleFollow}
+                    className={`ml-2 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all border ${
+                      isFollowing
+                        ? 'bg-[#EFE7DD] text-[#2C221E] border-transparent'
+                        : 'border-[#8B5E3C] text-[#8B5E3C] hover:bg-[#8B5E3C] hover:text-white'
+                    }`}
+                  >
+                    {isFollowing ? 'Kuzatildi' : 'Follow'}
+                  </button>
+                )}
+              </div>
+
+              {/* Top Action Icons */}
+              <div className="flex items-center gap-1.5">
                 <button
                   onClick={handleLike}
-                  className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-bold transition-all ${
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-bold transition-all ${
                     isLiked
-                      ? 'bg-rose-50 text-rose-600 border border-rose-200'
-                      : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                      ? 'bg-[#8B5E3C] text-white shadow-md shadow-[#8B5E3C]/20'
+                      : 'bg-[#EFE7DD] hover:bg-[#E6DEC3] text-[#2C221E]'
                   }`}
+                  title="Like"
                 >
-                  <Heart className={`w-4 h-4 ${isLiked ? 'fill-rose-500 text-rose-500' : ''}`} />
-                  <span>{likesCount}</span>
+                  <Heart className={`w-4 h-4 ${isLiked ? 'fill-white' : ''}`} />
+                  {likesCount > 0 && <span>{likesCount}</span>}
                 </button>
 
                 <button
                   onClick={handleCopyLink}
-                  className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors"
-                  title="Havolani nusxalash"
+                  className="p-2.5 rounded-full bg-[#EFE7DD] hover:bg-[#E6DEC3] text-[#2C221E] transition-colors"
+                  title="Ulashish"
                 >
                   {copySuccess ? (
                     <Check className="w-4 h-4 text-emerald-600" />
@@ -237,39 +283,40 @@ export const PostDetailPage: React.FC = () => {
                   )}
                 </button>
 
-                {currentMedia && (
-                  <a
-                    href={currentMedia.url}
-                    download={`visual-${post.id}`}
-                    className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors"
-                    title="Yuklab olish"
-                  >
-                    <Download className="w-4 h-4" />
-                  </a>
-                )}
+                <button
+                  onClick={() => {
+                    if (!isAuthenticated) openAuthModal('signin');
+                    else setIsCollectionModalOpen(true);
+                  }}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#EFE7DD] hover:bg-[#E6DEC3] text-[#2C221E] font-bold text-xs transition-all"
+                  title="To‘plamga saqlash"
+                >
+                  <Bookmark className="w-3.5 h-3.5" />
+                  <span>Saqlash</span>
+                </button>
 
                 {isOwner && (
                   <button
                     onClick={handleDeletePost}
-                    className="p-2 rounded-full hover:bg-rose-50 text-rose-500 transition-colors"
+                    className="p-2.5 rounded-full hover:bg-rose-50 text-[#C85A5A] transition-colors"
                     title="O‘chirish"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
                 )}
               </div>
+            </div>
 
-              {/* Save Button */}
-              <button
-                onClick={() => {
-                  if (!isAuthenticated) openAuthModal('signin');
-                  else setIsCollectionModalOpen(true);
-                }}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs shadow-md shadow-brand-500/20 active:scale-95 transition-all"
-              >
-                <Bookmark className="w-3.5 h-3.5" />
-                <span>Saqlash</span>
-              </button>
+            {/* Title & Description */}
+            <div className="space-y-3">
+              <h1 className="text-2xl font-extrabold text-[#2C221E] tracking-tight leading-snug">
+                {post.title || 'Sarlavhasiz post'}
+              </h1>
+              {post.description && (
+                <p className="text-sm text-[#8C7A6B] whitespace-pre-line leading-relaxed">
+                  {post.description}
+                </p>
+              )}
             </div>
 
             {/* Destination URL */}
@@ -278,33 +325,21 @@ export const PostDetailPage: React.FC = () => {
                 href={post.destinationUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-600 hover:text-brand-700 underline truncate max-w-full"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-[#8B5E3C] hover:text-[#6E472B] underline truncate max-w-full"
               >
                 <ExternalLink className="w-3.5 h-3.5 flex-shrink-0" />
                 <span className="truncate">{post.destinationUrl}</span>
               </a>
             )}
 
-            {/* Title & Description */}
-            <div className="space-y-2">
-              <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight leading-snug">
-                {post.title || 'Sarlavhasiz post'}
-              </h1>
-              {post.description && (
-                <p className="text-sm text-gray-600 whitespace-pre-line leading-relaxed">
-                  {post.description}
-                </p>
-              )}
-            </div>
-
-            {/* Tags */}
+            {/* Tags (Chips: #EFE7DD fon, #8C7A6B matn) */}
             {post.tags && post.tags.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 pt-2">
+              <div className="flex flex-wrap gap-2 pt-1">
                 {post.tags.map((t) => (
                   <Link
                     key={t.id}
                     to={`/explore?q=${encodeURIComponent(t.name)}`}
-                    className="px-3 py-1 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium transition-colors"
+                    className="px-3.5 py-1.5 rounded-full bg-[#EFE7DD] hover:bg-[#E6DEC3] text-[#8C7A6B] text-xs font-semibold transition-colors"
                   >
                     #{t.name}
                   </Link>
@@ -313,45 +348,20 @@ export const PostDetailPage: React.FC = () => {
             )}
           </div>
 
-          {/* Author Block */}
-          <div className="pt-6 border-t border-gray-100 flex items-center justify-between">
-            <Link
-              to={`/profile/${post.author?.username}`}
-              className="flex items-center gap-3 hover:opacity-85 transition-opacity"
-            >
-              <Avatar
-                src={post.author?.avatarUrl}
-                name={post.author?.fullName || post.author?.username}
-                size="md"
-              />
-              <div>
-                <p className="font-bold text-sm text-gray-900 leading-tight">
-                  {post.author?.fullName || post.author?.username}
-                </p>
-                <p className="text-xs text-gray-400">@{post.author?.username}</p>
-              </div>
-            </Link>
+          {/* Bottom Panel (Download Section) */}
+          <div className="pt-6 border-t border-[#EAE3D2] space-y-3">
+            <div className="flex items-center justify-between text-xs text-[#8C7A6B] font-medium">
+              <span>Media formati: <b>{currentMedia?.type || 'IMAGE'}</b></span>
+              <span>Yuqori sifat (HD)</span>
+            </div>
 
-            {!isOwner && (
-              <button
-                onClick={handleFollow}
-                className={`flex items-center gap-1 px-4 py-2 rounded-full text-xs font-bold transition-all ${
-                  isFollowing
-                    ? 'bg-gray-100 text-gray-700'
-                    : 'bg-gray-900 hover:bg-gray-800 text-white shadow-sm'
-                }`}
-              >
-                {isFollowing ? (
-                  <>
-                    <Check className="w-3.5 h-3.5" /> Kuzatildi
-                  </>
-                ) : (
-                  <>
-                    <UserPlus className="w-3.5 h-3.5" /> Kuzatish
-                  </>
-                )}
-              </button>
-            )}
+            <button
+              onClick={handleDownloadMain}
+              className="w-full py-3.5 px-6 rounded-full bg-[#8B5E3C] hover:bg-[#6E472B] active:scale-[0.99] text-white font-extrabold text-sm shadow-lg shadow-[#8B5E3C]/25 transition-all flex items-center justify-center gap-2"
+            >
+              <Download className="w-4 h-4" />
+              <span>Yuklab olish ({currentMedia?.type === 'VIDEO' ? 'Video' : 'Rasm'})</span>
+            </button>
           </div>
         </div>
       </div>

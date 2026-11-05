@@ -63,25 +63,25 @@ export const HomePage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Feed Filter Tabs */}
-      <div className="flex items-center justify-center gap-2">
+      <div className="flex items-center justify-center gap-2.5">
         <button
           onClick={() => handleTabChange('all')}
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all ${
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-extrabold transition-all ${
             activeTab === 'all'
-              ? 'bg-gray-950 text-white shadow-md'
-              : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-100'
+              ? 'bg-[#2C221E] text-white shadow-md'
+              : 'bg-[#EFE7DD] text-[#8C7A6B] hover:text-[#2C221E] hover:bg-[#E6DEC3]'
           }`}
         >
-          <Sparkles className="w-4 h-4" />
+          <Sparkles className="w-4 h-4 text-[#8B5E3C]" />
           <span>Siz uchun</span>
         </button>
 
         <button
           onClick={() => handleTabChange('following')}
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all ${
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-extrabold transition-all ${
             activeTab === 'following'
-              ? 'bg-gray-950 text-white shadow-md'
-              : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-100'
+              ? 'bg-[#2C221E] text-white shadow-md'
+              : 'bg-[#EFE7DD] text-[#8C7A6B] hover:text-[#2C221E] hover:bg-[#E6DEC3]'
           }`}
         >
           <UsersIcon className="w-4 h-4" />
@@ -100,18 +100,18 @@ export const HomePage: React.FC = () => {
         }
       />
 
-      {/* Load More Button */}
-      {hasMore && !isLoading && posts.length > 0 && (
-        <div className="py-8 text-center">
+      {/* Infinite Scroll / Load More */}
+      {hasMore && posts.length > 0 && (
+        <div className="py-8 flex justify-center">
           <button
             onClick={handleLoadMore}
-            className="px-6 py-2.5 rounded-full bg-white hover:bg-gray-100 text-gray-800 text-sm font-bold border border-gray-200 shadow-sm transition-all"
+            disabled={isLoading}
+            className="px-6 py-2.5 rounded-full bg-[#EFE7DD] hover:bg-[#E6DEC3] text-[#2C221E] text-xs font-bold transition-all disabled:opacity-50"
           >
-            Yana ko‘rish
+            {isLoading ? 'Yuklanmoqda...' : 'Yana yuklash'}
           </button>
         </div>
       )}
     </div>
   );
 };
-

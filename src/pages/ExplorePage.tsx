@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { Search, Tag, Users, Grid, Check, UserPlus } from 'lucide-react';
+import { Search, Tag, Users, Grid, Check, UserPlus, X, Loader2 } from 'lucide-react';
 import { searchApi, SearchResult } from '../api/search';
 import { tagsApi } from '../api/tags';
 import { MasonryGrid } from '../components/feed/MasonryGrid';
@@ -47,24 +47,45 @@ export const ExplorePage: React.FC = () => {
     [],
   );
 
+  // Real-time debounced qidiruv (Enter bosishga hojat yo'q, 300ms kechikish bilan avtomatik izlaydi)
+  const isFirstMount = useRef(true);
   useEffect(() => {
-    if (initialQuery) {
-      setSearchTerm(initialQuery);
-      handleSearch(initialQuery, activeFilter);
+    if (isFirstMount.current) {
+      isFirstMount.current = false;
+      if (initialQuery) {
+        setSearchTerm(initialQuery);
+        handleSearch(initialQuery, activeFilter);
+      }
+      return;
     }
-  }, [initialQuery, activeFilter, handleSearch]);
+
+    const trimmed = searchTerm.trim();
+    if (!trimmed) {
+      setSearchResult(null);
+      if (searchParams.get('q')) {
+        setSearchParams({}, { replace: true });
+      }
+      return;
+    }
+
+    const debounceTimer = setTimeout(() => {
+      setSearchParams({ q: trimmed }, { replace: true });
+      handleSearch(trimmed, activeFilter);
+    }, 300);
+
+    return () => clearTimeout(debounceTimer);
+  }, [searchTerm, activeFilter, handleSearch]);
 
   const onSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchTerm.trim()) {
-      setSearchParams({ q: searchTerm.trim() });
       handleSearch(searchTerm.trim(), activeFilter);
     }
   };
 
   const handleTagClick = (tagName: string) => {
     setSearchTerm(tagName);
-    setSearchParams({ q: tagName });
+    setSearchParams({ q: tagName }, { replace: true });
     handleSearch(tagName, activeFilter);
   };
 
@@ -91,22 +112,41 @@ export const ExplorePage: React.FC = () => {
     <div className="space-y-8">
       {/* Search Header */}
       <div className="max-w-2xl mx-auto text-center space-y-4">
-        <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+        <h1 className="text-3xl font-extrabold text-[#2C221E] tracking-tight">
           G‘oyalarni kashf qiling
         </h1>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-[#8C7A6B]">
           Dizayn, texnologiya, san’at va ilhom baxsh etuvchi minglab vizual kontentlar
         </p>
 
         <form onSubmit={onSearchSubmit} className="relative">
-          <Search className="w-5 h-5 text-gray-400 absolute left-4 top-3.5 pointer-events-none" />
+          <Search className="w-5 h-5 text-[#8C7A6B] absolute left-4 top-3.5 pointer-events-none" />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Qidiruv so‘zini kiriting..."
-            className="w-full pl-12 pr-4 py-3 rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 border border-gray-200 shadow-sm transition-all"
+            placeholder="Qidiruv so‘zini kiriting... (yozishingiz bilan real-time qidiradi)"
+            className="w-full pl-12 pr-12 py-3 rounded-full bg-[#EFE7DD] text-sm text-[#2C221E] placeholder-[#8C7A6B] focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/30 focus:border-[#8B5E3C] focus:bg-white border border-[#E6DEC3] shadow-sm transition-all"
           />
+          <div className="absolute right-4 top-3.5 flex items-center gap-1.5">
+            {isLoading && (
+              <Loader2 className="w-4 h-4 text-[#8B5E3C] animate-spin" />
+            )}
+            {searchTerm && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchTerm('');
+                  setSearchParams({}, { replace: true });
+                  setSearchResult(null);
+                }}
+                className="p-1 rounded-full text-[#8C7A6B] hover:text-[#2C221E] hover:bg-[#E6DEC3] transition-colors"
+                title="Tozalash"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
         </form>
 
         {/* Filter Pills */}
@@ -126,8 +166,8 @@ export const ExplorePage: React.FC = () => {
                 onClick={() => setActiveFilter(item.key)}
                 className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
                   activeFilter === item.key
-                    ? 'bg-gray-900 text-white shadow-sm'
-                    : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
+                    ? 'bg-[#2C221E] text-[#FAF7F2] shadow-sm'
+                    : 'bg-[#EFE7DD] text-[#8C7A6B] hover:text-[#2C221E] hover:bg-[#E6DEC3]'
                 }`}
               >
                 <Icon className="w-3.5 h-3.5" />
@@ -141,8 +181,8 @@ export const ExplorePage: React.FC = () => {
       {/* Trending Tags Section */}
       {!searchTerm && trendingTags.length > 0 && (
         <div className="space-y-3">
-          <h2 className="text-sm font-bold text-gray-700 flex items-center gap-2">
-            <Tag className="w-4 h-4 text-brand-500" />
+          <h2 className="text-sm font-bold text-[#2C221E] flex items-center gap-2">
+            <Tag className="w-4 h-4 text-[#8B5E3C]" />
             Trenddagi teglar
           </h2>
           <div className="flex flex-wrap gap-2">
@@ -152,10 +192,10 @@ export const ExplorePage: React.FC = () => {
                 <button
                   key={t.id}
                   onClick={() => handleTagClick(name)}
-                  className="px-4 py-2 rounded-2xl bg-white hover:bg-brand-50 hover:text-brand-600 text-gray-700 text-xs font-semibold border border-gray-200 transition-all flex items-center gap-1.5"
+                  className="px-4 py-2 rounded-2xl bg-[#EFE7DD] hover:bg-[#E6DEC3] text-[#2C221E] text-xs font-semibold border border-[#E6DEC3] transition-all flex items-center gap-1.5"
                 >
                   <span>#{name}</span>
-                  <span className="text-[10px] text-gray-400">({t.postsCount})</span>
+                  <span className="text-[10px] text-[#8C7A6B]">({t.postsCount})</span>
                 </button>
               );
             })}
@@ -171,15 +211,15 @@ export const ExplorePage: React.FC = () => {
             searchResult.users &&
             searchResult.users.data.length > 0 && (
               <div className="space-y-4">
-                <h3 className="text-sm font-bold text-gray-700 flex items-center gap-2">
-                  <Users className="w-4 h-4 text-brand-500" />
+                <h3 className="text-sm font-bold text-[#2C221E] flex items-center gap-2">
+                  <Users className="w-4 h-4 text-[#8B5E3C]" />
                   Topilgan mualliflar ({searchResult.users.total})
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                   {searchResult.users.data.map((u) => (
                     <div
                       key={u.id}
-                      className="p-4 bg-white rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between gap-3 hover:border-gray-200 transition-all"
+                      className="p-4 bg-white rounded-[18px] border border-[#E6DEC3] hover:border-[#8B5E3C] shadow-sm flex items-center justify-between gap-3 transition-all"
                     >
                       <Link
                         to={`/profile/${u.username}`}
@@ -187,10 +227,10 @@ export const ExplorePage: React.FC = () => {
                       >
                         <Avatar src={u.avatarUrl} name={u.fullName || u.username} size="md" />
                         <div className="truncate">
-                          <p className="font-bold text-sm text-gray-900 truncate">
+                          <p className="font-bold text-sm text-[#2C221E] truncate">
                             {u.fullName || u.username}
                           </p>
-                          <p className="text-xs text-gray-400 truncate">@{u.username}</p>
+                          <p className="text-xs text-[#8C7A6B] truncate">@{u.username}</p>
                         </div>
                       </Link>
 
@@ -198,8 +238,8 @@ export const ExplorePage: React.FC = () => {
                         onClick={() => handleFollowUser(u.id)}
                         className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
                           followingMap[u.id]
-                            ? 'bg-gray-100 text-gray-700'
-                            : 'bg-brand-500 hover:bg-brand-600 text-white'
+                            ? 'bg-[#EFE7DD] text-[#2C221E]'
+                            : 'bg-[#8B5E3C] hover:bg-[#6E472B] text-white shadow-sm shadow-[#8B5E3C]/20'
                         }`}
                       >
                         {followingMap[u.id] ? (
@@ -221,8 +261,8 @@ export const ExplorePage: React.FC = () => {
           {/* Posts Results */}
           {(activeFilter === 'all' || activeFilter === 'posts') && (
             <div className="space-y-4">
-              <h3 className="text-sm font-bold text-gray-700 flex items-center gap-2">
-                <Grid className="w-4 h-4 text-brand-500" />
+              <h3 className="text-sm font-bold text-[#2C221E] flex items-center gap-2">
+                <Grid className="w-4 h-4 text-[#8B5E3C]" />
                 Topilgan postlar ({searchResult.posts?.total || 0})
               </h3>
               <MasonryGrid

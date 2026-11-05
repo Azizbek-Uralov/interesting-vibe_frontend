@@ -124,7 +124,7 @@ export const ProfilePage: React.FC = () => {
   if (isLoading) {
     return (
       <div className="py-24 flex justify-center">
-        <div className="w-8 h-8 rounded-full border-4 border-brand-500 border-t-transparent animate-spin" />
+        <div className="w-8 h-8 rounded-full border-4 border-[#8B5E3C] border-t-transparent animate-spin" />
       </div>
     );
   }
@@ -132,10 +132,10 @@ export const ProfilePage: React.FC = () => {
   if (!profile) {
     return (
       <div className="py-20 text-center">
-        <h2 className="text-xl font-bold text-gray-900">Foydalanuvchi topilmadi</h2>
+        <h2 className="text-xl font-bold text-[#2C221E]">Foydalanuvchi topilmadi</h2>
         <button
           onClick={() => navigate('/')}
-          className="mt-4 px-6 py-2 rounded-full bg-gray-900 text-white text-xs font-bold"
+          className="mt-4 px-6 py-2 rounded-full bg-[#8B5E3C] hover:bg-[#6E472B] text-white text-xs font-bold transition-all shadow-md shadow-[#8B5E3C]/20"
         >
           Bosh sahifaga qaytish
         </button>
@@ -152,11 +152,11 @@ export const ProfilePage: React.FC = () => {
             src={profile.avatarUrl}
             name={profile.fullName || profile.username}
             size="xl"
-            className="w-28 h-28 text-3xl shadow-lg ring-4 ring-white"
+            className="w-28 h-28 text-3xl shadow-lg ring-4 ring-[#EAE3D2] border-2 border-[#E6DEC3]"
           />
           {profile.isPrivate && (
             <div
-              className="absolute bottom-1 right-1 p-1.5 rounded-full bg-gray-900 text-white shadow"
+              className="absolute bottom-1 right-1 p-1.5 rounded-full bg-[#2C221E] text-[#FAF7F2] shadow"
               title="Yopiq profil"
             >
               <Lock className="w-3.5 h-3.5" />
@@ -166,18 +166,18 @@ export const ProfilePage: React.FC = () => {
 
         <div className="space-y-1">
           <div className="flex items-center justify-center gap-1.5">
-            <h1 className="text-2xl font-black text-gray-900 tracking-tight">
+            <h1 className="text-2xl font-black text-[#2C221E] tracking-tight">
               {profile.fullName || profile.username}
             </h1>
             {profile.isVerified && (
-              <BadgeCheck className="w-5 h-5 text-sky-500 fill-sky-500 text-white" />
+              <BadgeCheck className="w-5 h-5 text-[#8B5E3C] fill-[#8B5E3C] text-white" />
             )}
           </div>
-          <p className="text-xs font-bold text-gray-400">@{profile.username}</p>
+          <p className="text-xs font-bold text-[#8C7A6B]">@{profile.username}</p>
         </div>
 
         {profile.bio && (
-          <p className="text-sm text-gray-600 max-w-md leading-relaxed whitespace-pre-line">
+          <p className="text-sm text-[#8C7A6B] max-w-md leading-relaxed whitespace-pre-line">
             {profile.bio}
           </p>
         )}
@@ -185,20 +185,20 @@ export const ProfilePage: React.FC = () => {
         {/* Counts Bar */}
         <div className="flex items-center gap-8 py-2">
           <div className="text-center">
-            <p className="font-black text-lg text-gray-900">{profile.postsCount || 0}</p>
-            <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
+            <p className="font-black text-xl text-[#2C221E]">{profile.postsCount || 0}</p>
+            <p className="text-[11px] font-bold text-[#8C7A6B] uppercase tracking-wider">
               Postlar
             </p>
           </div>
           <div className="text-center">
-            <p className="font-black text-lg text-gray-900">{profile.followersCount || 0}</p>
-            <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
+            <p className="font-black text-xl text-[#2C221E]">{profile.followersCount || 0}</p>
+            <p className="text-[11px] font-bold text-[#8C7A6B] uppercase tracking-wider">
               Kuzatuvchilar
             </p>
           </div>
           <div className="text-center">
-            <p className="font-black text-lg text-gray-900">{profile.followingCount || 0}</p>
-            <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
+            <p className="font-black text-xl text-[#2C221E]">{profile.followingCount || 0}</p>
+            <p className="text-[11px] font-bold text-[#8C7A6B] uppercase tracking-wider">
               Kuzatmoqda
             </p>
           </div>
@@ -210,13 +210,13 @@ export const ProfilePage: React.FC = () => {
             <>
               <button
                 onClick={() => setIsEditing(true)}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold transition-all"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#EFE7DD] hover:bg-[#E6DEC3] text-[#2C221E] text-xs font-bold transition-all shadow-sm"
               >
-                <Edit3 className="w-4 h-4" /> Profilni tahrirlash
+                <Edit3 className="w-4 h-4 text-[#8B5E3C]" /> Profilni tahrirlash
               </button>
               <button
                 onClick={logoutUser}
-                className="p-2.5 rounded-full bg-gray-100 hover:bg-rose-50 text-gray-600 hover:text-rose-600 transition-colors"
+                className="p-2.5 rounded-full bg-[#EFE7DD] hover:bg-[#C85A5A]/15 text-[#2C221E] hover:text-[#C85A5A] transition-colors shadow-sm"
                 title="Chiqish"
               >
                 <LogOut className="w-4 h-4" />
@@ -228,8 +228,8 @@ export const ProfilePage: React.FC = () => {
                 onClick={handleFollowToggle}
                 className={`flex items-center gap-1.5 px-6 py-2.5 rounded-full text-xs font-bold shadow-md transition-all ${
                   isFollowing
-                    ? 'bg-gray-100 text-gray-800 shadow-none'
-                    : 'bg-brand-500 hover:bg-brand-600 text-white shadow-brand-500/25'
+                    ? 'bg-[#EFE7DD] text-[#2C221E] shadow-none hover:bg-[#E6DEC3]'
+                    : 'bg-[#8B5E3C] hover:bg-[#6E472B] text-white shadow-[#8B5E3C]/25'
                 }`}
               >
                 {isFollowing ? (
@@ -251,10 +251,10 @@ export const ProfilePage: React.FC = () => {
                     navigate(`/messages?userId=${profile.id}`);
                   }
                 }}
-                className="flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold transition-all shadow-sm"
+                className="flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-[#EFE7DD] hover:bg-[#E6DEC3] text-[#2C221E] text-xs font-bold transition-all shadow-sm"
                 title="Xabar yozish"
               >
-                <MessageSquare className="w-4 h-4 text-brand-500" />
+                <MessageSquare className="w-4 h-4 text-[#8B5E3C]" />
                 Xabar
               </button>
             </>
@@ -263,29 +263,29 @@ export const ProfilePage: React.FC = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center justify-center gap-2 border-b border-gray-100 pb-3">
+      <div className="flex items-center justify-center gap-6 border-b border-[#EAE3D2] pb-0">
         <button
           onClick={() => setActiveTab('posts')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all ${
+          className={`flex items-center gap-2 pb-3 text-sm font-bold transition-all border-b-2 ${
             activeTab === 'posts'
-              ? 'bg-gray-900 text-white'
-              : 'text-gray-500 hover:text-gray-900'
+              ? 'border-[#8B5E3C] text-[#2C221E]'
+              : 'border-transparent text-[#8C7A6B] hover:text-[#2C221E]'
           }`}
         >
-          <Grid className="w-3.5 h-3.5" />
+          <Grid className="w-4 h-4" />
           <span>Yaratilgan postlar</span>
         </button>
 
         {isMe && (
           <button
             onClick={() => setActiveTab('collections')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all ${
+            className={`flex items-center gap-2 pb-3 text-sm font-bold transition-all border-b-2 ${
               activeTab === 'collections'
-                ? 'bg-gray-900 text-white'
-                : 'text-gray-500 hover:text-gray-900'
+                ? 'border-[#8B5E3C] text-[#2C221E]'
+                : 'border-transparent text-[#8C7A6B] hover:text-[#2C221E]'
             }`}
           >
-            <Bookmark className="w-3.5 h-3.5" />
+            <Bookmark className="w-4 h-4" />
             <span>Saqlangan to‘plamlar ({collections.length})</span>
           </button>
         )}
@@ -294,11 +294,11 @@ export const ProfilePage: React.FC = () => {
       {/* Tab Content */}
       {profile.canViewContent === false ? (
         <div className="py-16 text-center space-y-3">
-          <div className="w-14 h-14 mx-auto rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+          <div className="w-14 h-14 mx-auto rounded-full bg-[#EFE7DD] flex items-center justify-center text-[#8C7A6B]">
             <Lock className="w-6 h-6" />
           </div>
-          <h3 className="font-bold text-gray-800 text-sm">Bu akkaunt yopiq (shaxsiy)</h3>
-          <p className="text-xs text-gray-400 max-w-xs mx-auto">
+          <h3 className="font-bold text-[#2C221E] text-sm">Bu akkaunt yopiq (shaxsiy)</h3>
+          <p className="text-xs text-[#8C7A6B] max-w-xs mx-auto">
             Foydalanuvchining postlarini ko‘rish uchun unga kuzatish so‘rovini yuboring.
           </p>
         </div>
@@ -314,22 +314,22 @@ export const ProfilePage: React.FC = () => {
             <div
               key={col.id}
               onClick={() => navigate('/collections')}
-              className="group bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md cursor-pointer transition-all"
+              className="group bg-white rounded-[18px] border border-[#E6DEC3] hover:border-[#8B5E3C] overflow-hidden shadow-sm hover:shadow-md cursor-pointer transition-all"
             >
-              <div className="h-36 bg-gray-100 flex items-center justify-center overflow-hidden">
+              <div className="h-36 bg-[#F4EFE6] flex items-center justify-center overflow-hidden">
                 {col.coverUrl ? (
                   <img
                     src={col.coverUrl}
                     alt={col.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                 ) : (
-                  <Bookmark className="w-8 h-8 text-gray-300" />
+                  <Bookmark className="w-8 h-8 text-[#8C7A6B]/50" />
                 )}
               </div>
               <div className="p-3">
-                <p className="font-bold text-sm text-gray-900 truncate">{col.name}</p>
-                <p className="text-[11px] text-gray-400">{col.itemsCount || 0} ta post</p>
+                <p className="font-bold text-sm text-[#2C221E] truncate">{col.name}</p>
+                <p className="text-[11px] text-[#8C7A6B]">{col.itemsCount || 0} ta post</p>
               </div>
             </div>
           ))}
@@ -339,46 +339,46 @@ export const ProfilePage: React.FC = () => {
       {/* Edit Profile Modal */}
       {isEditing && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 max-w-md w-full space-y-4">
-            <h3 className="text-lg font-extrabold text-gray-900">Profilni tahrirlash</h3>
+          <div className="bg-[#FAF7F2] rounded-[28px] border border-[#E6DEC3] shadow-2xl p-6 sm:p-8 max-w-md w-full space-y-4">
+            <h3 className="text-lg font-extrabold text-[#2C221E]">Profilni tahrirlash</h3>
 
             <form onSubmit={handleSaveProfile} className="space-y-3.5">
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">To‘liq ism</label>
+                <label className="block text-xs font-bold text-[#2C221E] mb-1">To‘liq ism</label>
                 <input
                   type="text"
                   value={editFullName}
                   onChange={(e) => setEditFullName(e.target.value)}
-                  className="w-full px-3.5 py-2 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full px-3.5 py-2 text-sm rounded-xl bg-white border border-[#E6DEC3] text-[#2C221E] focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/30 focus:border-[#8B5E3C]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Bio</label>
+                <label className="block text-xs font-bold text-[#2C221E] mb-1">Bio</label>
                 <textarea
                   rows={3}
                   value={editBio}
                   onChange={(e) => setEditBio(e.target.value)}
                   placeholder="O‘zingiz haqingizda..."
-                  className="w-full px-3.5 py-2 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
+                  className="w-full px-3.5 py-2 text-sm rounded-xl bg-white border border-[#E6DEC3] text-[#2C221E] placeholder-[#8C7A6B]/60 focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/30 focus:border-[#8B5E3C] resize-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Avatar URL</label>
+                <label className="block text-xs font-bold text-[#2C221E] mb-1">Avatar URL</label>
                 <input
                   type="url"
                   value={editAvatarUrl}
                   onChange={(e) => setEditAvatarUrl(e.target.value)}
                   placeholder="https://example.com/avatar.jpg"
-                  className="w-full px-3.5 py-2 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full px-3.5 py-2 text-sm rounded-xl bg-white border border-[#E6DEC3] text-[#2C221E] placeholder-[#8C7A6B]/60 focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/30 focus:border-[#8B5E3C]"
                 />
               </div>
 
-              <div className="flex items-center justify-between p-3 rounded-2xl bg-gray-50 border border-gray-100">
+              <div className="flex items-center justify-between p-3 rounded-2xl bg-[#EFE7DD]/40 border border-[#E6DEC3]">
                 <div>
-                  <p className="text-xs font-bold text-gray-800">Shaxsiy (Yopiq) profil</p>
-                  <p className="text-[10px] text-gray-400">
+                  <p className="text-xs font-bold text-[#2C221E]">Shaxsiy (Yopiq) profil</p>
+                  <p className="text-[10px] text-[#8C7A6B]">
                     Faqat siz tasdiqlagan kuzatuvchilar postingizni ko‘radi
                   </p>
                 </div>
@@ -386,7 +386,7 @@ export const ProfilePage: React.FC = () => {
                   type="checkbox"
                   checked={editIsPrivate}
                   onChange={(e) => setEditIsPrivate(e.target.checked)}
-                  className="w-4 h-4 rounded text-brand-500 focus:ring-brand-500 cursor-pointer"
+                  className="w-4 h-4 rounded text-[#8B5E3C] focus:ring-[#8B5E3C] cursor-pointer accent-[#8B5E3C]"
                 />
               </div>
 
@@ -394,7 +394,7 @@ export const ProfilePage: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleDeleteAccount}
-                  className="text-xs text-rose-500 hover:text-rose-600 font-semibold flex items-center gap-1"
+                  className="text-xs text-[#C85A5A] hover:text-[#A74444] font-semibold flex items-center gap-1"
                 >
                   <Trash2 className="w-3.5 h-3.5" /> Akkauntni o‘chirish
                 </button>
@@ -403,14 +403,14 @@ export const ProfilePage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setIsEditing(false)}
-                    className="px-4 py-2 rounded-full text-xs font-semibold text-gray-500 hover:bg-gray-100"
+                    className="px-4 py-2 rounded-full text-xs font-semibold text-[#8C7A6B] hover:bg-[#EFE7DD]"
                   >
                     Bekor qilish
                   </button>
                   <button
                     type="submit"
                     disabled={isSavingProfile}
-                    className="px-5 py-2 rounded-full bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold disabled:opacity-50"
+                    className="px-5 py-2 rounded-full bg-[#8B5E3C] hover:bg-[#6E472B] text-white text-xs font-bold shadow-md shadow-[#8B5E3C]/20 disabled:opacity-50"
                   >
                     {isSavingProfile ? 'Saqlanmoqda...' : 'Saqlash'}
                   </button>

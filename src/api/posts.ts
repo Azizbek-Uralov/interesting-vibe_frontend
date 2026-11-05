@@ -69,6 +69,11 @@ export const postsApi = {
     return res.data;
   },
 
+  addMediaBatch: async (postId: string, data: AddMediaDto[]) => {
+    const res = await apiClient.post(`/posts/${postId}/media/batch`, data);
+    return res.data;
+  },
+
   reorderMedia: async (postId: string, mediaIds: string[]) => {
     const res = await apiClient.patch(`/posts/${postId}/media/order`, { mediaIds });
     return res.data;

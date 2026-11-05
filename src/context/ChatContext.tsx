@@ -19,7 +19,7 @@ interface ChatContextType {
   totalUnreadCount: number;
   isLoading: boolean;
   fetchConversations: () => Promise<void>;
-  sendMessage: (conversationId: string, content: string) => Promise<void>;
+  sendMessage: (conversationId: string, content: string) => Promise<ChatMessage | null>;
   markConversationAsRead: (conversationId: string) => Promise<void>;
   startConversationWithUser: (participantId: string) => Promise<string>;
 }
@@ -100,39 +100,51 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     // Yangi xabar kelganda suhbatlar ro'yxatini yangilash
+    const updateConversationWithMessage = (conversationId: string, message: ChatMessage) => {
+      setConversations((prev) => {
+        const index = prev.findIndex((c) => c.id === conversationId);
+        if (index === -1) {
+          fetchConversations();
+          return prev;
+        }
+
+        const updated = [...prev];
+        const conv = updated[index];
+        const isCurrentlyActive = activeConversationId === conversationId;
+
+        updated[index] = {
+          ...conv,
+          lastMessage: {
+            id: message.id,
+            senderId: message.senderId,
+            content: message.content,
+            isRead: message.isRead,
+            createdAt: message.createdAt,
+          },
+          lastMessageAt: message.createdAt,
+          unreadCount:
+            isCurrentlyActive || message.senderId === user?.id
+              ? conv.unreadCount
+              : conv.unreadCount + 1,
+        };
+
+        // Eng oxirgi xabarli suhbatni yuqoriga surish
+        return [updated[index], ...updated.filter((_, i) => i !== index)];
+      });
+    };
+
     newSocket.on(
       'new_message_notification',
       ({ conversationId, message }: { conversationId: string; message: ChatMessage }) => {
-        setConversations((prev) => {
-          const index = prev.findIndex((c) => c.id === conversationId);
-          if (index === -1) {
-            // Yangi suhbat ochilgan bo'lsa qayta yuklaymiz
-            fetchConversations();
-            return prev;
-          }
-
-          const updated = [...prev];
-          const conv = updated[index];
-          const isCurrentlyActive = activeConversationId === conversationId;
-
-          updated[index] = {
-            ...conv,
-            lastMessage: {
-              id: message.id,
-              senderId: message.senderId,
-              content: message.content,
-              isRead: message.isRead,
-              createdAt: message.createdAt,
-            },
-            lastMessageAt: message.createdAt,
-            unreadCount: isCurrentlyActive ? conv.unreadCount : conv.unreadCount + 1,
-          };
-
-          // Eng oxirgi xabarli suhbatni yuqoriga surish
-          return [updated[index], ...updated.filter((_, i) => i !== index)];
-        });
+        updateConversationWithMessage(conversationId, message);
       },
     );
+
+    newSocket.on('new_message', (message: ChatMessage) => {
+      if (message?.conversationId) {
+        updateConversationWithMessage(message.conversationId, message);
+      }
+    });
 
     // Xabarlar o'qilganda suhbatdagi oxirgi xabarni isRead qilish
     newSocket.on('message_read', ({ conversationId }: { conversationId: string }) => {
@@ -158,31 +170,66 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Xabar yuborish
   const sendMessage = useCallback(
-    async (conversationId: string, content: string) => {
-      if (!content.trim()) return;
+    async (conversationId: string, content: string): Promise<ChatMessage | null> => {
+      if (!content.trim()) return null;
 
-      if (socketRef.current && socketRef.current.connected) {
-        socketRef.current.emit('send_message', { conversationId, content });
-      } else {
-        // Fallback REST API
-        const newMsg = await chatApi.sendMessage(conversationId, content);
-        setConversations((prev) =>
-          prev.map((c) =>
-            c.id === conversationId
-              ? {
-                  ...c,
-                  lastMessage: {
-                    id: newMsg.id,
-                    senderId: newMsg.senderId,
-                    content: newMsg.content,
-                    isRead: newMsg.isRead,
-                    createdAt: newMsg.createdAt,
-                  },
-                  lastMessageAt: newMsg.createdAt,
+      try {
+        if (socketRef.current && socketRef.current.connected) {
+          return new Promise<ChatMessage | null>((resolve) => {
+            let responded = false;
+
+            socketRef.current?.emit(
+              'send_message',
+              { conversationId, content: content.trim() },
+              (res: any) => {
+                responded = true;
+                if (res?.message) {
+                  resolve(res.message);
+                } else {
+                  resolve(null);
                 }
-              : c,
-          ),
-        );
+              },
+            );
+
+            // 1.5 soniyada javob bo'lmasa fallback REST ga o'tish
+            setTimeout(async () => {
+              if (!responded) {
+                try {
+                  const fallbackMsg = await chatApi.sendMessage(
+                    conversationId,
+                    content.trim(),
+                  );
+                  resolve(fallbackMsg);
+                } catch {
+                  resolve(null);
+                }
+              }
+            }, 1200);
+          });
+        } else {
+          // Fallback REST API
+          const newMsg = await chatApi.sendMessage(conversationId, content.trim());
+          setConversations((prev) =>
+            prev.map((c) =>
+              c.id === conversationId
+                ? {
+                    ...c,
+                    lastMessage: {
+                      id: newMsg.id,
+                      senderId: newMsg.senderId,
+                      content: newMsg.content,
+                      isRead: newMsg.isRead,
+                      createdAt: newMsg.createdAt,
+                    },
+                    lastMessageAt: newMsg.createdAt,
+                  }
+                : c,
+            ),
+          );
+          return newMsg;
+        }
+      } catch {
+        return null;
       }
     },
     [],

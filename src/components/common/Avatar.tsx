@@ -10,9 +10,9 @@ interface AvatarProps {
 export const Avatar: React.FC<AvatarProps> = ({ src, name, size = 'md', className = '' }) => {
   const sizeClasses = {
     sm: 'w-7 h-7 text-xs',
-    md: 'w-9 h-9 text-sm',
-    lg: 'w-12 h-12 text-base',
-    xl: 'w-20 h-20 text-xl font-bold',
+    md: 'w-10 h-10 text-sm',
+    lg: 'w-14 h-14 text-base',
+    xl: 'w-24 h-24 text-2xl font-bold',
   }[size];
 
   const initials = (name || 'U')
@@ -27,9 +27,8 @@ export const Avatar: React.FC<AvatarProps> = ({ src, name, size = 'md', classNam
       <img
         src={src}
         alt={name || 'Avatar'}
-        className={`${sizeClasses} rounded-full object-cover border border-gray-200 ${className}`}
+        className={`${sizeClasses} rounded-full object-cover border-2 border-[#E6DEC3] hover:border-[#8B5E3C] transition-colors ${className}`}
         onError={(e) => {
-          // rasm yuklanmasa fallback
           (e.target as HTMLElement).style.display = 'none';
         }}
       />
@@ -38,10 +37,9 @@ export const Avatar: React.FC<AvatarProps> = ({ src, name, size = 'md', classNam
 
   return (
     <div
-      className={`${sizeClasses} rounded-full bg-gradient-to-tr from-brand-600 to-rose-400 text-white flex items-center justify-center font-medium select-none shadow-sm ${className}`}
+      className={`${sizeClasses} rounded-full bg-gradient-to-tr from-[#8B5E3C] to-[#B58862] text-white flex items-center justify-center font-bold select-none border-2 border-[#E6DEC3] shadow-sm ${className}`}
     >
       {initials}
     </div>
   );
 };
-
